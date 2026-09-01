@@ -32,7 +32,12 @@
                     <tbody>
                         {% for nodo in servidores %}
                         <tr>
-                            <td>{{ nodo.nombre_host }}</td>
+                            <td>
+                                <a href="{% url 'detalle_servidor' nodo.pk %}"
+                                    class="text-decoration-none fw-bold text-primary">
+                                    {{ nodo.nombre_host }}
+                                </a>
+                            </td>
                             <td>{{ nodo.direccion_ip }}</td>
                             <td>{{ nodo.get_motor_contenedores_display }}</td>
                             <td>{% if nodo.proxy_inverso %}<span class="text-success fw-bold">Sí</span>{% else %}<span
