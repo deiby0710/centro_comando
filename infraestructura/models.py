@@ -45,3 +45,39 @@ class RegistroAuditoria(models.Model):
     fecha_evento = models.DateTimeField(
         auto_now_add=True
     )
+
+class IncidenciaServidor(models.Model):
+    SEVERIDAD_CHOICES = [
+        ('BAJA', 'Baja'),
+        ('MEDIA', 'Media'),
+        ('ALTA', 'Alta'),
+        ('CRITICA', 'Crítica'),
+    ]
+
+    ESTADO_CHOICES = [
+        ('ABIERTA', 'Abierta'),
+        ('EN_PROCESO', 'En proceso'),
+        ('RESUELTA', 'Resuelta'),
+    ]
+
+    servidor = models.ForeignKey(
+        NodoServidor,
+        on_delete=models.CASCADE,
+        related_name='incidencias'
+    )
+    titulo = models.CharField(max_length=200)
+    descripcion = models.TextField()
+    severidad = models.CharField(
+        max_length=10,
+        choices=SEVERIDAD_CHOICES,
+        default='MEDIA'
+    )
+    estado = models.CharField(
+        max_length=15,
+        choices=ESTADO_CHOICES,
+        default='ABIERTA'
+    )
+    fecha_reporte = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.titulo

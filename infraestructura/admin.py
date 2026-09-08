@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import NodoServidor, RegistroAuditoria
+from .models import IncidenciaServidor, NodoServidor, RegistroAuditoria
 
 def marcar_como_produccion(modeladmin, request, queryset):
     queryset.update(en_produccion=True)
@@ -32,3 +32,28 @@ class NodoServidorAdmin(admin.ModelAdmin):
 class RegistroAuditoriaAdmin(admin.ModelAdmin):
     list_display = ('servidor', 'detalles', 'fecha_evento')
     list_filter = ('fecha_evento',)
+
+@admin.register(IncidenciaServidor)
+class IncidenciaServidorAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'titulo',
+        'servidor',
+        'severidad',
+        'estado',
+        'fecha_reporte'
+    )
+
+    list_filter = (
+        'severidad',
+        'estado',
+        'fecha_reporte'
+    )
+
+    search_fields = (
+        'titulo',
+        'descripcion',
+        'servidor__nombre_host'
+    )
+
+    ordering = ('-fecha_reporte',)

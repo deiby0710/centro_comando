@@ -31,8 +31,58 @@
                         <span class="text-muted">{{ nodo.fecha_despliegue|date:"Y-m-d H:i" }}</span>
                     </li>
                 </ul>
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3">Alertas activas</h5>
+
+                    {% if incidencias_activas %}
+                        {% for incidencia in incidencias_activas %}
+                            <div class="alert alert-light border shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0">
+                                        {{ incidencia.titulo }}
+                                    </h6>
+
+                                    {% if incidencia.severidad == 'CRITICA' %}
+                                        <span class="badge bg-danger">Crítica</span>
+                                    {% elif incidencia.severidad == 'ALTA' %}
+                                        <span class="badge bg-warning text-dark">Alta</span>
+                                    {% elif incidencia.severidad == 'MEDIA' %}
+                                        <span class="badge bg-primary">Media</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Baja</span>
+                                    {% endif %}
+                                </div>
+
+                                <p class="mb-2">
+                                    {{ incidencia.descripcion }}
+                                </p>
+
+                                <small class="text-muted">
+                                    Reportada:
+                                    {{ incidencia.fecha_reporte|date:"Y-m-d H:i" }}
+                                </small>
+                                <form method="post" action="{% url 'resolver_incidencia' incidencia.pk %}" class="mt-3">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        Marcar como resuelta
+                                    </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">
+                            No hay alertas activas para este servidor.
+                        </p>
+                    {% endif %}
+                </div>
                 <div class="d-flex justify-content-between">
-                    <a href="{% url 'home_servidores' %}" class="btn btn-outline-secondary">← Volver al Listado</a>
+                    <a href="{% url 'home_servidores' %}" class="btn btn-outline-secondary">
+                        ← Volver al Listado
+                    </a>
+
+                    <a href="{% url 'crear_incidencia' nodo.pk %}" class="btn btn-primary">
+                        + Registrar incidencia
+                    </a>
                 </div>
             </div>
         </div>

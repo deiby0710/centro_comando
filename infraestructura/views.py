@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from infraestructura.forms import NodoServidorForm
-from .models import NodoServidor
+from infraestructura.forms import IncidenciaServidorForm, NodoServidorForm
+from .models import IncidenciaServidor, NodoServidor
 
 def eliminar_servidor(request, pk):
     nodo = get_object_or_404(NodoServidor, pk=pk)
@@ -32,10 +32,46 @@ def crear_servidor(request):
 
 
 def detalle_servidor(request, pk):
-	nodo = get_object_or_404(NodoServidor, pk=pk)
-	return render(request, 'infraestructura/detalle.html', {'nodo':nodo})
+    nodo = get_object_or_404(NodoServidor, pk=pk)
+    incidencias_activas = nodo.incidencias.exclude(estado='RESUELTA')
+    return render(
+        request,
+        'infraestructura/detalle.html',
+        {
+            'nodo': nodo,
+            'incidencias_activas': incidencias_activas,
+        }
+    )
 
 def lista_servidores(request):
 	servidores = NodoServidor.objects.all()
 	contexto = {'servidores': servidores}
 	return render(request, 'infraestructura/index.html', contexto)
+
+def crear_incidencia(request, pk):
+    servidor = get_object_or_404(NodoServidor, pk=pk)
+    if request.method == 'POST':
+        form = IncidenciaServidorForm(request.POST)
+        if form.is_valid():
+            incidencia = form.save(commit=False)
+            incidencia.servidor = servidor
+            incidencia.save()
+            return redirect('detalle_servidor', pk=servidor.pk)
+    else:
+        form = IncidenciaServidorForm()
+    return render(
+        request,
+        'infraestructura/crear_incidencia.html',
+        {
+            'form': form,
+            'servidor': servidor,
+        }
+    )
+
+def resolver_incidencia(request, pk):
+    incidencia = get_object_or_404(IncidenciaServidor, pk=pk)
+    if request.method == 'POST':
+        incidencia.estado = 'RESUELTA'
+        incidencia.save()
+        return redirect('detalle_servidor', pk=incidencia.servidor.pk)
+    return redirect('detalle_servidor', pk=incidencia.servidor.pk)
