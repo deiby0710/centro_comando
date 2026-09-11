@@ -1,6 +1,11 @@
+from urllib import response
 from django.shortcuts import get_object_or_404, redirect, render
 from infraestructura.forms import IncidenciaServidorForm, NodoServidorForm
+from infraestructura.serializers import IncidenciaServidorSerializer, NodoServidorSerializer
 from .models import IncidenciaServidor, NodoServidor
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 def eliminar_servidor(request, pk):
     nodo = get_object_or_404(NodoServidor, pk=pk)
@@ -75,3 +80,29 @@ def resolver_incidencia(request, pk):
         incidencia.save()
         return redirect('detalle_servidor', pk=incidencia.servidor.pk)
     return redirect('detalle_servidor', pk=incidencia.servidor.pk)
+
+class IncidenciaServidorListCreateAPIView(generics.ListCreateAPIView):
+    queryset = IncidenciaServidor.objects.all()
+    serializer_class = IncidenciaServidorSerializer
+
+class IncidenciaServidorDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = IncidenciaServidor.objects.all()
+    serializer_class = IncidenciaServidorSerializer
+
+
+class NodoServidorListCreateAPIView(generics.ListCreateAPIView):
+    queryset = NodoServidor.objects.all()
+    serializer_class = NodoServidorSerializer
+
+
+class NodoServidorDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = NodoServidor.objects.all()
+    serializer_class = NodoServidorSerializer
+
+class ApiRootView(APIView):
+    def get(self, request):
+        return Response({
+            'incidencias': request.build_absolute_uri('/api/incidencias/'),
+            'servidores': request.build_absolute_uri('/api/servidores/'),
+            'documentacion': request.build_absolute_uri('/api/docs/'),
+        })
